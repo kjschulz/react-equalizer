@@ -26,7 +26,11 @@ export default class Equalizer extends Component {
     setTimeout(this.updateChildrenHeights, 0)
   }
 
-  static getHeights(nodes, byRow = true, byBsCol = false) {
+  static getHeights(nodes, byRow = true, byBsCol) {
+    if (byBsCol) {
+      byRow = false;
+    }
+
     let lastElTopOffset = 0,
         groups          = [],
         row             = 0,
