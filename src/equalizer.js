@@ -26,10 +26,11 @@ export default class Equalizer extends Component {
     setTimeout(this.updateChildrenHeights, 0)
   }
 
-  static getHeights(nodes, byRow = true) {
+  static getHeights(nodes, byRow = true, byBsCol = false) {
     let lastElTopOffset = 0,
         groups          = [],
-        row             = 0
+        row             = 0,
+        rowColTotal     = 0
 
     groups[row] = []
 
@@ -47,10 +48,23 @@ export default class Equalizer extends Component {
         lastElTopOffset = elOffsetTop
       }
 
-      if (elOffsetTop != lastElTopOffset && byRow) {
-        row++
-        groups[row] = []
-        lastElTopOffset = elOffsetTop
+      if (byBsCol) {
+        var bsColSize = Number(
+          node.className.split('col-md-')[1].slice(0, 2)
+        );
+
+        if (rowColTotal >= 12) {
+          row++;
+          groups[row] = [];
+          lastElTopOffset = elOffsetTop;
+          rowColTotal = 0;
+        }
+        
+        rowColTotal += bsColSize;
+      } else if (elOffsetTop != lastElTopOffset && byRow) {
+        row++;
+        groups[row] = [];
+        lastElTopOffset = elOffsetTop;
       }
 
       groups[row].push([node, elHeight])
@@ -66,7 +80,7 @@ export default class Equalizer extends Component {
   }
 
   updateChildrenHeights() {
-    const { property, byRow, enabled } = this.props
+    const { property, byRow, byBsCol, enabled } = this.props
     const node = this.rootNode
 
     if (!node || !enabled(this, node)) {
@@ -88,7 +102,7 @@ export default class Equalizer extends Component {
   }
 
   render() {
-    const {children, property, byRow, enabled, nodes, ...otherProps} = this.props
+    const {children, property, byRow, byBsCol, enabled, nodes, ...otherProps} = this.props
     return (
       <div ref={node => this.rootNode = node} onLoad={this.handleResize} {...otherProps}>
         {children}
@@ -100,6 +114,7 @@ export default class Equalizer extends Component {
 Equalizer.defaultProps = {
   property: 'height',
   byRow:    true,
+  byBsCol:  false,
   enabled:  () => true,
   nodes:    (component, node) => node.children
 }
@@ -108,6 +123,7 @@ Equalizer.propTypes = {
   children: PropTypes.node.isRequired,
   property: PropTypes.string,
   byRow:    PropTypes.bool,
+  byBsCol:  PropTypes.bool,
   enabled:  PropTypes.func,
   nodes:    PropTypes.func
 }
