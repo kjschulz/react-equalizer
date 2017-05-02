@@ -26,7 +26,7 @@ export default class Equalizer extends Component {
     setTimeout(this.updateChildrenHeights, 0)
   }
 
-  static getHeights(nodes, byRow = true, byBsCol) {
+  static getHeights(nodes, byRow = true, byBsCol = false) {
     if (byBsCol) {
       byRow = false;
     }
@@ -63,7 +63,7 @@ export default class Equalizer extends Component {
           lastElTopOffset = elOffsetTop;
           rowColTotal = 0;
         }
-        
+
         rowColTotal += bsColSize;
       } else if (elOffsetTop != lastElTopOffset && byRow) {
         row++;
@@ -93,7 +93,7 @@ export default class Equalizer extends Component {
 
     if (node !== undefined) {
       const children = this.props.nodes(this, node)
-      const heights  = this.constructor.getHeights(children, byRow)
+      const heights  = this.constructor.getHeights(children, byRow, byBsCol)
 
       for (let row = 0; row < heights.length; row++) {
         const max = heights[row][heights[row].length-1]
